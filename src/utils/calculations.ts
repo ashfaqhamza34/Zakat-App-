@@ -25,6 +25,10 @@ export function calculateZakat(
   inputs: AssetInputs,
   nisabMethod: NisabMethod
 ): CalculationResult {
+  const relevantRateMissing = nisabMethod === 'gold'
+    ? (inputs.goldRatePerGram || 0) === 0
+    : (inputs.silverRatePerGram || 0) === 0;
+
   const purityFactor = PURITY_FACTORS[inputs.goldPurity] || 1;
   const goldPureGrams = inputs.goldGrams * purityFactor;
   const goldValue = goldPureGrams * (inputs.goldRatePerGram || 0);
@@ -67,5 +71,6 @@ export function calculateZakat(
     shortfall,
     zakatDue,
     calculatedAt: new Date().toISOString(),
+    relevantRateMissing,
   };
 }

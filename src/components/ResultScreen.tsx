@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {
   CheckCircle2,
   AlertTriangle,
+  AlertCircle,
   Share2,
   Copy,
   Check,
@@ -32,6 +33,66 @@ export const ResultScreen: React.FC<ResultScreenProps> = ({
 }) => {
   const [copied, setCopied] = useState(false);
   const isEligible = result.isEligible;
+
+  // If the relevant gold or silver rate is 0, show a distinct warning state instead of an invalid 0-nisab result
+  if (result.relevantRateMissing) {
+    const rateName = result.nisabMethod === 'gold' ? 'Gold (24K)' : 'Silver';
+    return (
+      <div className="pb-24 pt-3 px-3 max-w-lg mx-auto space-y-4">
+        {/* Main Warning State Banner */}
+        <div className="relative overflow-hidden rounded-3xl p-6 bg-gradient-to-br from-slate-700 via-slate-800 to-slate-900 border border-slate-600/60 text-white shadow-lg text-center">
+          <div className="relative z-10 flex flex-col items-center">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl mb-3 bg-slate-600/50 text-slate-200 border border-slate-500/40 shadow-inner">
+              <AlertCircle className="h-8 w-8 text-amber-300" />
+            </div>
+
+            <span className="text-xs uppercase tracking-widest font-semibold text-slate-300">
+              Nisab Rate Required
+            </span>
+
+            <h2 className="font-heading text-2xl font-semibold mt-1 tracking-wide text-white">
+              Rate Not Available
+            </h2>
+
+            <p className="text-xs text-slate-300 mt-2 max-w-xs leading-relaxed">
+              The {rateName} market rate is required to calculate the Nisab threshold under the {result.nisabMethod === 'gold' ? 'Gold' : 'Silver'} standard. Please enter the current rate before a result can be shown.
+            </p>
+
+            <div className="my-5 w-full border-t border-slate-700" />
+
+            <div className="rounded-xl bg-slate-800/80 border border-slate-700 p-3 text-xs text-slate-300 text-left w-full space-y-1">
+              <div className="font-semibold text-slate-200 flex items-center gap-1.5">
+                <Scale className="h-3.5 w-3.5 text-amber-400" />
+                <span>Selected Standard: {result.nisabMethod === 'gold' ? 'Gold Nisab (87.48g)' : 'Silver Nisab (612.36g)'}</span>
+              </div>
+              <p className="text-[11px] text-slate-400">
+                Without the {result.nisabMethod} price per gram, your Nisab threshold cannot be evaluated.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Action Button routing back to InputScreen */}
+        <div className="pt-2">
+          <button
+            type="button"
+            id="missing-rate-modify-inputs-btn"
+            onClick={onModifyInputs}
+            className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#0F4C3A] hover:bg-[#0d4131] active:bg-[#0a3327] text-white py-3.5 px-4 font-heading font-semibold tracking-wide text-sm shadow-md transition-all active:scale-[0.98]"
+          >
+            <RotateCcw className="h-4 w-4" />
+            <span>Enter {rateName} Rate</span>
+          </button>
+        </div>
+
+        <div className="rounded-xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 p-3 text-center">
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-normal">
+            Tip: You can use the "Sync Live Rates" button on the Input screen to automatically fetch the latest Pakistani Sarafa market rates.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   // Prepare text for sharing (formatted for WhatsApp / SMS / clipboard)
   const generateShareText = () => {

@@ -35,6 +35,7 @@ export interface CalculationResult {
   shortfall: number;
   zakatDue: number;
   calculatedAt: string;
+  relevantRateMissing: boolean;
 }
 
 export type ScreenTab = 'input' | 'result' | 'chat' | 'settings';

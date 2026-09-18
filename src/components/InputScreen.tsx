@@ -72,6 +72,10 @@ export const InputScreen: React.FC<InputScreenProps> = ({
     (inputs.businessValue || 0);
   const netWealth = Math.max(0, totalAssets - (inputs.liabilities || 0));
 
+  const relevantRateMissing = nisabMethod === 'gold'
+    ? (inputs.goldRatePerGram || 0) === 0
+    : (inputs.silverRatePerGram || 0) === 0;
+
   // Unit toggle for entering rates: 'gram' or 'tola'
   const [rateUnit, setRateUnit] = useState<'gram' | 'tola'>('gram');
 
@@ -733,7 +737,13 @@ export const InputScreen: React.FC<InputScreenProps> = ({
             type="button"
             id="calculate-zakat-btn"
             onClick={onCalculate}
-            className="flex items-center gap-2 rounded-xl bg-[#0F4C3A] hover:bg-[#0d4131] active:bg-[#0a3327] text-white px-4 py-3 text-sm font-semibold shadow-md transition-all active:scale-[0.98] shrink-0 font-heading tracking-wide"
+            disabled={relevantRateMissing}
+            title={relevantRateMissing ? `Please enter the ${nisabMethod} rate to view result` : 'View Result'}
+            className={`flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold shadow-md transition-all shrink-0 font-heading tracking-wide ${
+              relevantRateMissing
+                ? 'bg-slate-300 dark:bg-slate-700 text-slate-500 dark:text-slate-400 cursor-not-allowed shadow-none'
+                : 'bg-[#0F4C3A] hover:bg-[#0d4131] active:bg-[#0a3327] text-white active:scale-[0.98]'
+            }`}
           >
             <span>View Result</span>
             <ArrowRight className="h-4 w-4" />
