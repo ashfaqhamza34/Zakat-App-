@@ -3,8 +3,19 @@ import path from 'path';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
+import rateLimit from 'express-rate-limit';
 
 dotenv.config();
+
+// Rate limiter for chat endpoint: 15 requests per 5 minutes per IP
+const chatRateLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  limit: 15,
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  statusCode: 429,
+  message: { error: 'Too many requests, please try again shortly.' },
+});
 
 function getGeminiClient(): GoogleGenAI | null {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -37,7 +48,7 @@ async function startServer() {
   });
 
   // AI Zakat Assistant Chat Route
-  app.post('/api/chat', async (req, res) => {
+  app.post('/api/chat', chatRateLimiter, async (req, res) => {
     try {
       const { messages, userContext } = req.body;
 
@@ -105,7 +116,7 @@ ${contextNote}`;
       }));
 
       const response = await ai.models.generateContent({
-        model: 'gemini-3.8-flash',
+        model: 'gemini-2.5-flash',
         contents,
         config: {
           systemInstruction,
@@ -119,8 +130,7 @@ ${contextNote}`;
     } catch (error: any) {
       console.error('Gemini chat error:', error);
       return res.status(500).json({
-        error: 'Failed to process chat with Gemini AI.',
-        details: error?.message || String(error),
+        error: 'Failed to process chat with Gemini AI. Please try again.',
       });
     }
   });

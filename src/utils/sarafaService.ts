@@ -23,11 +23,28 @@ export async function fetchLiveSarafaRates(): Promise<LiveSarafaRates> {
   const timeoutId = setTimeout(() => controller.abort(), 7000);
 
   try {
-    // 1. Fetch live gold and silver spot prices in USD
-    const [goldRes, silverRes, fxRes] = await Promise.all([
+    // 1. Fetch live gold and silver spot prices in USD (required)
+    // 2. Fetch live USD/PKR FX rate (wrapped in try/catch with fallback to 278.0)
+    let pkrRate = 278.0;
+
+    const fxPromise = (async () => {
+      try {
+        const fxRes = await fetch('https://open.er-api.com/v6/latest/USD', { signal: controller.signal });
+        if (fxRes.ok) {
+          const fxData = await fxRes.json();
+          if (fxData.rates && fxData.rates.PKR) {
+            return Number(fxData.rates.PKR);
+          }
+        }
+      } catch {
+        // Fall back to default pkrRate if FX API fails or times out
+      }
+      return 278.0;
+    })();
+
+    const [goldRes, silverRes] = await Promise.all([
       fetch('https://api.gold-api.com/price/XAU', { signal: controller.signal }),
       fetch('https://api.gold-api.com/price/XAG', { signal: controller.signal }),
-      fetch('https://open.er-api.com/v6/latest/USD', { signal: controller.signal }),
     ]);
 
     clearTimeout(timeoutId);
@@ -36,16 +53,13 @@ export async function fetchLiveSarafaRates(): Promise<LiveSarafaRates> {
       throw new Error('MARKET_FEED_ERROR');
     }
 
-    const goldData = await goldRes.json();
-    const silverData = await silverRes.json();
-    let pkrRate = 278.0;
+    const [goldData, silverData, resolvedPkrRate] = await Promise.all([
+      goldRes.json(),
+      silverRes.json(),
+      fxPromise,
+    ]);
 
-    if (fxRes.ok) {
-      const fxData = await fxRes.json();
-      if (fxData.rates && fxData.rates.PKR) {
-        pkrRate = Number(fxData.rates.PKR);
-      }
-    }
+    pkrRate = resolvedPkrRate;
 
     const goldUsdPerOunce = Number(goldData.price);
     const silverUsdPerOunce = Number(silverData.price);
