@@ -731,6 +731,12 @@ export const InputScreen: React.FC<InputScreenProps> = ({
             <div className="text-[10px] text-slate-400 tabular-nums">
               Assets: {formatPKR(totalAssets)} • Debts: {formatPKR(inputs.liabilities)}
             </div>
+            {relevantRateMissing && (
+              <p className="text-[10px] text-rose-500 dark:text-rose-400 mt-1 flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />
+                Enter today's {nisabMethod === 'gold' ? 'gold' : 'silver'} rate to calculate
+              </p>
+            )}
           </div>
 
           <button
@@ -738,7 +744,6 @@ export const InputScreen: React.FC<InputScreenProps> = ({
             id="calculate-zakat-btn"
             onClick={onCalculate}
             disabled={relevantRateMissing}
-            title={relevantRateMissing ? `Please enter the ${nisabMethod} rate to view result` : 'View Result'}
             className={`flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold shadow-md transition-all shrink-0 font-heading tracking-wide ${
               relevantRateMissing
                 ? 'bg-slate-300 dark:bg-slate-700 text-slate-500 dark:text-slate-400 cursor-not-allowed shadow-none'
