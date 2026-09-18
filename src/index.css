@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-heading: 'Outfit', sans-serif;
+    --font-body: 'Manrope', sans-serif;
+  }
+
+  body {
+    font-family: var(--font-body);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Headings & App Title: Outfit, semi-bold (600), slightly increased letter-spacing */
+  h1, h2, h3, h4, .font-heading, .heading-refined {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  /* Explicit application to interactive controls */
+  input, button, select, textarea {
+    font-family: var(--font-body);
+  }
+
+  /* Numeric values: tabular/monospaced numerals for clean column alignment */
+  .tabular-nums,
+  .font-mono-nums,
+  .numeral-value,
+  input[inputmode="numeric"],
+  input[inputmode="decimal"],
+  input[type="text"] {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+  }
+
+  /* Card description text line-height adjustment (1.45 - 1.5) */
+  .card-desc,
+  .text-desc {
+    line-height: 1.48;
+  }
+}
+
+@keyframes splashProgress {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+.animate-splash-progress {
+  animation: splashProgress 3.8s linear forwards;
+}
+

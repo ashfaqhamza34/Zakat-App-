@@ -1,0 +1,6 @@
+{
+  "name": "Zakat Calculator Pakistan",
+  "description": "Material 3 Zakat Calculator for Pakistan with PKR currency, live Sarafa rates, Gold/Silver Nisab, and an intelligent AI Zakat Assistant chatbot.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
